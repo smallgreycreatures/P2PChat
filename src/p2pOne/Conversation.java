@@ -127,10 +127,17 @@ public class Conversation {
 		System.out.println(msg);
 	}
 
-	public void exitChat() {
+	public void exitChat() throws IOException {
 
-		sendMsg("^EXIT^CHAT^");
+		System.out.println("exitChat");
 
+		Message message = new Message("^EXIT^CHAT^", convID, socketOut.getInetAddress(), myNickName);
+		System.out.println("Created message " + message.toString());
+
+		outputStream.writeObject(message);
+		localOutputStream.writeObject(message);
+
+		System.out.println("Exit chat done");
 
 	}
 	public synchronized void disconnect() throws IOException{
@@ -173,10 +180,12 @@ public class Conversation {
 					Message msg = (Message) inputStream.readObject();
 
 					//if(msg.getConvID().equals(convID))
-					display(msg);
-					System.out.println("Running!");
+
 					if(msg.getText().equals("^EXIT^CHAT^")) {
 						disconnect();
+					}
+					else {
+						display(msg);
 					}
 				}
 
@@ -207,11 +216,14 @@ public class Conversation {
 					Message msg = (Message) localInputStream.readObject();
 
 					//if(msg.getConvID().equals(convID))
-					display(msg);
 
 					if(msg.getText().equals("^EXIT^CHAT^")) {
 						disconnect();
 					}
+					else {
+						display(msg);
+					}
+
 				}
 
 				catch(IOException e) { display("Sever has closed the connection " +e); listeningLocal = false;}

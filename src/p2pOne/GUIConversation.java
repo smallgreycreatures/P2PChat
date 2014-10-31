@@ -114,7 +114,9 @@ public class GUIConversation extends JFrame implements ActionListener {
 		public void windowClosing(WindowEvent e) {
 			System.out.println("Cloosing!");
 
-			conv.exitChat();
+			try {
+				conv.exitChat();
+			} catch (IOException e1) { System.out.println("IOException while sending sending exit message" + e1.getMessage());}
 
 			setDefaultCloseOperation(HIDE_ON_CLOSE);
 		}
