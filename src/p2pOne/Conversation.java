@@ -148,6 +148,7 @@ public class Conversation {
 		if(socketLocal != null) {
 			socketLocal.close();
 		}
+		System.out.println("Disconnected!");
 	}
 	
 	/**

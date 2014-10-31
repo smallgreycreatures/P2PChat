@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -20,6 +21,8 @@ public class GUIMain extends JFrame {
 	private JButton connectBtn;
 	
 	private int serverPort;
+	
+	private Server server;
 	
 	public GUIMain() {
 		
@@ -42,7 +45,7 @@ public class GUIMain extends JFrame {
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setVisible(true);
 		
-		Server server = new Server(serverPort, this);
+		server = new Server(serverPort, this);
 		server.start();
 	}
 	
@@ -86,6 +89,9 @@ public class GUIMain extends JFrame {
 		@Override
 		public void windowClosing(WindowEvent e) {
 			System.out.println("Cloosing!");
+			try {
+				server.disconnect();
+			} catch (IOException e1) { System.out.println("Exception while closing server " + e1.getMessage());}
 			setDefaultCloseOperation(EXIT_ON_CLOSE);
 		}
 	}

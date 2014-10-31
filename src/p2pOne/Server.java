@@ -163,6 +163,24 @@ public class Server extends Thread {
 
 		System.out.println(text);
 	}
+	
+	/**
+	 * Disconnects all clients and then closes serverSocket
+	 * @throws IOException
+	 */
+	public void disconnect() throws IOException {
+		
+		display("Diconnecting");
+		
+		for(int i = 0; i < clientList.size(); i++) {
+			
+			clientList.get(i).disconnect();
+			display("Client " + clientList.get(i).id + " is disconnected");
+		}
+		
+		serverSocket.close();
+		display("ServerSocket closed");
+	}
 
 	/**
 	 * Class that extends Thread and represent a new instance of a 
@@ -231,9 +249,32 @@ public class Server extends Thread {
 			try {
 				outputStream.writeObject(msg);
 			} catch (IOException e) { display("IOException while sending Message " + e.getMessage()); }
-		}	
+		}
+		/**
+		 * Closes all streams and the socket
+		 * @throws IOException
+		 */
+		public void disconnect() throws IOException {
+			
+			if(inputStream != null) {
+				inputStream.close();
+			}
+			if(outputStream != null) {
+				outputStream.close();
+			}
+			if(socket != null) {
+				socket.close();
+			}
+			
+		}
 	}
-
+	/**
+	 * A Thread that starts a new conversation
+	 * so the server can continue listening instead
+	 * of creating conversations.
+	 * @author Frans
+	 *
+	 */
 	class StartConversation extends Thread {
 
 		private String address;
