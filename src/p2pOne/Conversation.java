@@ -8,6 +8,9 @@ import java.net.UnknownHostException;
 
 public class Conversation {
 
+	private int portNr;
+	private String serverAddress;
+	
 	private GUIConversation guiConversation;
 	
 	private Socket socketOut;
@@ -38,6 +41,8 @@ public class Conversation {
 	 */
 	public Conversation(int portNr, String serverAddress, GUIConversation conversationWindow, String nick) {
 
+		this.portNr = portNr;
+		this.serverAddress = serverAddress;
 		this.guiConversation = conversationWindow;
 		this.myNickName = nick;
 		
@@ -45,13 +50,14 @@ public class Conversation {
 		try {
 			socketOut = new Socket(serverAddress, portNr);
 			socketLocal = new Socket("localhost", 2000);
-
+			System.out.println("Sockets up");
 			outputStream = new ObjectOutputStream(socketOut.getOutputStream());
 			inputStream = new ObjectInputStream(socketOut.getInputStream());
-
+			System.out.println("remote Streams up");
 			localOutputStream = new ObjectOutputStream(socketLocal.getOutputStream());
 			localInputStream = new ObjectInputStream(socketLocal.getInputStream());
 
+			System.out.println("local streams up");
 		} catch (UnknownHostException e) {
 			display("Unknown host exception while setting up sockets/streams " + e.getMessage());
 		} catch (IOException e) {
@@ -69,6 +75,7 @@ public class Conversation {
 		System.out.println("Conversation initiation finished!");
 	}
 	
+	
 	/**
 	 * Sends a message through an outputstream connected to remote serversocket
 	 * @param msg
@@ -80,7 +87,7 @@ public class Conversation {
 		System.out.println("Created message " + message.toString());
 		try {
 			outputStream.writeObject(message);
-			display(message);
+			//display(message);
 			
 		} catch (IOException e) { display("IOException while sending message " + e.getMessage()); }
 	}
@@ -106,7 +113,7 @@ public class Conversation {
 	 * @param msg
 	 */
 	private synchronized void display(Message msg) {
-
+		System.out.println(msg.toString());
 		guiConversation.append(msg.toString());
 	}
 
@@ -136,7 +143,7 @@ public class Conversation {
 				try {
 					Message msg = (Message) inputStream.readObject();
 
-					if(msg.getConvID().equals(convID))
+					//if(msg.getConvID().equals(convID))
 						display(msg);
 					System.out.println("Running!");
 
@@ -168,7 +175,7 @@ public class Conversation {
 					System.out.println("Running!");
 					Message msg = (Message) localInputStream.readObject();
 
-					if(msg.getConvID().equals(convID))
+					//if(msg.getConvID().equals(convID))
 						display(msg);
 				}
 
