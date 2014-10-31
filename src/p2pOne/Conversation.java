@@ -128,7 +128,8 @@ public class Conversation {
 	}
 
 	public void exitChat() throws IOException {
-
+		sendMsg("User disconnected");
+		
 		System.out.println("exitChat");
 
 		Message message = new Message("^EXIT^CHAT^", convID, socketOut.getInetAddress(), myNickName);
