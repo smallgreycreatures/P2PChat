@@ -10,9 +10,9 @@ public class Conversation {
 
 	private int portNr;
 	private String serverAddress;
-	
+
 	private GUIConversation guiConversation;
-	
+
 	private Socket socketOut;
 	private Socket socketLocal;
 
@@ -26,9 +26,9 @@ public class Conversation {
 
 	private boolean listeningRemote;
 	private boolean listeningLocal;
-	
+
 	private String myNickName;
-	
+
 	/**
 	 * Initiates the conversation by creating to Sockets that connects 
 	 * to the local server and remote server. It then creates Streams 
@@ -45,7 +45,7 @@ public class Conversation {
 		this.serverAddress = serverAddress;
 		this.guiConversation = conversationWindow;
 		this.myNickName = nick;
-		
+
 		System.out.println("Conversation initiation started");
 		try {
 			socketOut = new Socket(serverAddress, portNr);
@@ -68,14 +68,14 @@ public class Conversation {
 
 		RemoteServerListener remoteServer = new RemoteServerListener();
 		remoteServer.start();
-		
+
 		LocalServerListener localServer = new LocalServerListener();
 		localServer.start();
 
 		System.out.println("Conversation initiation finished!");
 	}
-	
-	
+
+
 	/**
 	 * Sends a message through an outputstream connected to remote serversocket
 	 * @param msg
@@ -88,7 +88,7 @@ public class Conversation {
 		try {
 			outputStream.writeObject(message);
 			//display(message);
-			
+
 		} catch (IOException e) { display("IOException while sending message " + e.getMessage()); }
 	}
 
@@ -127,7 +127,13 @@ public class Conversation {
 		System.out.println(msg);
 	}
 
-	public void disconnect() throws IOException {
+	public void exitChat() {
+
+		sendMsg("^EXIT^CHAT^");
+
+
+	}
+	public synchronized void disconnect() throws IOException{
 		if(outputStream != null) {
 			outputStream.close();
 		}
@@ -140,17 +146,16 @@ public class Conversation {
 		if(localInputStream != null) {
 			localInputStream.close();
 		}
-		
+
 		if(socketOut != null) {
 			socketOut.close();
 		}
-		
+
 		if(socketLocal != null) {
 			socketLocal.close();
 		}
 		System.out.println("Disconnected!");
 	}
-	
 	/**
 	 * Thread that is listening for data sent by remote serversocket 
 	 * @author Frans
@@ -168,9 +173,11 @@ public class Conversation {
 					Message msg = (Message) inputStream.readObject();
 
 					//if(msg.getConvID().equals(convID))
-						display(msg);
+					display(msg);
 					System.out.println("Running!");
-
+					if(msg.getText().equals("^EXIT^CHAT^")) {
+						disconnect();
+					}
 				}
 
 				catch(IOException e) { display("Sever has closed the connection " +e); listeningRemote = false;}
@@ -200,7 +207,11 @@ public class Conversation {
 					Message msg = (Message) localInputStream.readObject();
 
 					//if(msg.getConvID().equals(convID))
-						display(msg);
+					display(msg);
+
+					if(msg.getText().equals("^EXIT^CHAT^")) {
+						disconnect();
+					}
 				}
 
 				catch(IOException e) { display("Sever has closed the connection " +e); listeningLocal = false;}

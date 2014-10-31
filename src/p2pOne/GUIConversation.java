@@ -113,11 +113,9 @@ public class GUIConversation extends JFrame implements ActionListener {
 		@Override
 		public void windowClosing(WindowEvent e) {
 			System.out.println("Cloosing!");
-			try {
-				conv.disconnect();
-			} catch (IOException e1) {
-				System.out.println("Exception while shutting down " + e1.getMessage());
-			}
+
+			conv.exitChat();
+
 			setDefaultCloseOperation(HIDE_ON_CLOSE);
 		}
 	}
