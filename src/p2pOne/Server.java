@@ -72,8 +72,11 @@ public class Server extends Thread {
 		try {
 
 			running = true;
+			boolean exists;
 
 			while(running) {
+
+				exists = false;
 
 				System.out.println("Server up! waiting for incoming connections");
 
@@ -81,24 +84,37 @@ public class Server extends Thread {
 
 				if(!running) break;
 
-				ClientThread client = new ClientThread(socket);
+				//Check if connecting ip already is connected
+				if(clientList.size() > 0) {
+					for(ClientThread ct: clientList) {
+						display(ct.socket.getInetAddress().getHostAddress() + " =? " + socket.getInetAddress().getHostAddress());
+						if(ct.socket.getInetAddress().equals(socket.getInetAddress())) {
+							exists = true;
+						}
+					}
+				}
+				
+				//if not connected - do this
+				if(exists == false) {
+					ClientThread client = new ClientThread(socket);
 
-				clientList.add(client);
+					clientList.add(client);
 
-				client.start();
-				System.out.println(socket.getInetAddress().getHostAddress() + " != " + serverSocket.getInetAddress().getHostAddress() + " == " + localServerAddress.getHostAddress());
-				if(!socket.getInetAddress().getHostAddress().equals("127.0.0.1")) {
-					System.out.println("Opening window :oooo");
-					String address = socket.getInetAddress().getHostAddress();
-					System.out.println(address + " " + socket.getPort());					
-					StartConversation start = new StartConversation(address, 2000, "name");
-					start.start();
-					display("ujujuj");
+					client.start();
+					System.out.println(socket.getInetAddress().getHostAddress() + " != " + serverSocket.getInetAddress().getHostAddress() + " == " + localServerAddress.getHostAddress());
+					if(!socket.getInetAddress().getHostAddress().equals("127.0.0.1")) {
+						System.out.println("Opening window :oooo");
+						String address = socket.getInetAddress().getHostAddress();
+						System.out.println(address + " " + socket.getPort());					
+						StartConversation start = new StartConversation(address, 2000, "name");
+						start.start();
+						display("ujujuj");
+					}
+					userId++;
+
 				}
 
 
-
-				userId++;
 			} 
 			System.out.println("Closing server!");
 
