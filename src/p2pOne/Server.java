@@ -24,13 +24,16 @@ public class Server extends Thread {
 	private ArrayList<InetAddress> inetList;
 	private boolean running;
 
+	private GUIMain gui;
 	/**
 	 * Initiates the ServerSocket and the ArrayList for threads
 	 * @param port
 	 */
-	public Server(int port) {
+	public Server(int port, GUIMain gui) {
 
 		this.portNr = port;
+		this.gui = gui;
+
 		try {
 			this.localServerAddress = InetAddress.getLocalHost();
 		} catch (UnknownHostException e1) {
@@ -93,7 +96,7 @@ public class Server extends Thread {
 						}
 					}
 				}
-				
+
 				//if not connected - do this
 				if(exists == false) {
 					ClientThread client = new ClientThread(socket);
@@ -102,13 +105,20 @@ public class Server extends Thread {
 
 					client.start();
 					System.out.println(socket.getInetAddress().getHostAddress() + " != " + serverSocket.getInetAddress().getHostAddress() + " == " + localServerAddress.getHostAddress());
-					if(!socket.getInetAddress().getHostAddress().equals("127.0.0.1")) {
-						System.out.println("Opening window :oooo");
-						String address = socket.getInetAddress().getHostAddress();
-						System.out.println(address + " " + socket.getPort());					
-						StartConversation start = new StartConversation(address, 2000, "name");
-						start.start();
-						display("ujujuj");
+
+					//check if the connected address is remote or localhost
+					for(InetAddress iAdd: inetList) {
+						
+						//if it's not from localhost - open conversation window
+						if(!socket.getInetAddress().equals(iAdd)) {
+							System.out.println("Opening window :oooo");
+							String address = socket.getInetAddress().getHostAddress();
+							System.out.println(address + " " + socket.getPort());
+
+							StartConversation start = new StartConversation(address, portNr, gui.getName());
+							start.start();
+							display("ujujuj");
+						}
 					}
 					userId++;
 

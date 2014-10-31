@@ -19,7 +19,11 @@ public class GUIMain extends JFrame {
 	
 	private JButton connectBtn;
 	
+	private int serverPort;
+	
 	public GUIMain() {
+		
+		serverPort = 2000;
 		
 		JPanel pan = new JPanel();
 		pan.setLayout(new BoxLayout(pan ,BoxLayout.Y_AXIS));
@@ -38,8 +42,18 @@ public class GUIMain extends JFrame {
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setVisible(true);
 		
-		Server server = new Server(2000);
+		Server server = new Server(serverPort, this);
 		server.start();
+	}
+	
+	public String getName() {
+		
+		if(nickField.equals("")) {
+			return "anon";
+		}
+		else { 
+			return nickField.getText();
+		}
 	}
 	
 	class ConnectListener implements ActionListener {
