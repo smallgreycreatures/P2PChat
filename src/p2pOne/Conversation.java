@@ -127,6 +127,29 @@ public class Conversation {
 		System.out.println(msg);
 	}
 
+	public void disconnect() throws IOException {
+		if(outputStream != null) {
+			outputStream.close();
+		}
+		if(inputStream != null) {
+			inputStream.close();
+		}
+		if(localOutputStream != null) {
+			localOutputStream.close();
+		}
+		if(localInputStream != null) {
+			localInputStream.close();
+		}
+		
+		if(socketOut != null) {
+			socketOut.close();
+		}
+		
+		if(socketLocal != null) {
+			socketLocal.close();
+		}
+	}
+	
 	/**
 	 * Thread that is listening for data sent by remote serversocket 
 	 * @author Frans

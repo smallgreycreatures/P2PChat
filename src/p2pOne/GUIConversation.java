@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -99,6 +100,7 @@ public class GUIConversation extends JFrame implements ActionListener {
 		msg = outMsgArea.getText();
 		System.out.println("before sendMSG");
 		conv.sendMsg(msg);
+		outMsgArea.setText("");
 	}
 	
 	public String getMsg() {
@@ -111,6 +113,11 @@ public class GUIConversation extends JFrame implements ActionListener {
 		@Override
 		public void windowClosing(WindowEvent e) {
 			System.out.println("Cloosing!");
+			try {
+				conv.disconnect();
+			} catch (IOException e1) {
+				System.out.println("Exception while shutting down " + e1.getMessage());
+			}
 			setDefaultCloseOperation(HIDE_ON_CLOSE);
 		}
 	}
