@@ -5,10 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 
 public class Server extends Thread {
 
@@ -19,16 +16,26 @@ public class Server extends Thread {
 	
 	private boolean running;
 	
+	/**
+	 * Initiates the ServerSocket and the ArrayList for threads
+	 * @param port
+	 */
 	public Server(int port) {
 		
 		this.portNr = port;
+		
+		try { serverSocket = new ServerSocket(portNr); }
+		catch (IOException e) { display("IOException while setting up Server Socket" + e.getMessage()); }
+
 		clientList = new ArrayList<ClientThread>();
 	}
 	
+	/**
+	 * Listens to incoming connections and create new Threads of them
+	 */
 	public void run() {
 		
 		try {
-			serverSocket = new ServerSocket(portNr);
 			
 			running = true;
 			
@@ -45,25 +52,26 @@ public class Server extends Thread {
 				clientList.add(client);
 				
 				client.start();
-				
+				userId++;
 			} 
 			System.out.println("Closing server!");
 			
 
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} catch (IOException e) { display("IOException while recieving new Socket connection " + e.getMessage()); }
 		
 	}
 	
+	/**
+	 * Broadcasts the message to the client in the clientList with matching IP
+	 * @param msg
+	 */
 	public synchronized void broadcast(Message msg) {
 		
 		display("Time to broadcast");
 		
 		for(ClientThread clientThread: clientList) {
 			
-			if(clientThread.socket.getInetAddress() == msg.getToIPAddress()) {
+			if(clientThread.socket.getInetAddress().equals(msg.getToIPAddress())) {
 				
 				clientThread.sendMsg(msg);
 				display("it did broadcast?");
@@ -71,10 +79,22 @@ public class Server extends Thread {
 		}
 	}
 	
+	/**
+	 * Display text
+	 * @param text
+	 */
 	public synchronized void display(String text) {
 		
 		System.out.println(text);
 	}
+	
+	/**
+	 * Class that extends Thread and represent a new instance of a 
+	 * connection to a client
+	 * @author Frans
+	 *
+	 */
+	 
 	class ClientThread extends Thread {
 		
 		private Socket socket;
@@ -83,36 +103,40 @@ public class Server extends Thread {
 		private int id;
 		private Message msg;
 		private String username;
-		
-		private SimpleDateFormat dateFormat;
-		
+				
+		/**
+		 * Initiates the connection by setting up streams and give the
+		 * connection an id 
+		 * @param socket
+		 */
 		public ClientThread(Socket socket) {
 			display("Initiating ClientThread" + id);
 			
 			this.socket = socket;
 			this.id = userId;
 			this.username = socket.getLocalPort() + "";
-			dateFormat = new SimpleDateFormat("yyyy.MM.dd G 'at' HH:mm:ss z");
 			
 			try {
 				inputStream = new ObjectInputStream(socket.getInputStream());
 				outputStream = new ObjectOutputStream(socket.getOutputStream());
 				display("Stream for ClientThread" + id + " up!");
 				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				display("IOException while setting up clientThread streams " + e.getMessage());
-			}
+			} catch (IOException e) { display("IOException while setting up clientThread streams " + e.getMessage()); }
 		}
 		
+		/**
+		 * Listens to input from clients and prepare the message for
+		 * broadcasting
+		 */
 		public void run() {
 			display("ClientThread" + id + " running");
+			
 			while(true) {
 				
 				try {
 					display("ClientThread" + id + " get msg");
 					msg = (Message) inputStream.readObject();
-					display(msg.toString());
+					//display(msg.toString());
 				}
 				catch(IOException e) { display("IOException while reading msg for ClientThread" + e.getMessage()); }
 				catch(ClassNotFoundException e) { display("ClassNotFoundException while reading msg for ClientThread" + e.getMessage()); }
@@ -122,22 +146,15 @@ public class Server extends Thread {
 			}
 		}
 		
+		/**
+		 * Sends the message to the connected client
+		 * @param msg
+		 */
 		public void sendMsg(Message msg) {
 			
 			try {
 				outputStream.writeObject(msg);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-		public String addDate(Message msg) {
-			String timeAndDate = dateFormat.format(new Date());
-			dateFormat.applyPattern("HH:mm:ss");
-			
-			return timeAndDate + ":" + msg.getText() + "\n";
-		}
+			} catch (IOException e) { display("IOException while sending Message " + e.getMessage()); }
+		}	
 	}
-	
 }

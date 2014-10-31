@@ -12,7 +12,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class GUIMain extends JFrame {
-
+	
+	private JTextField nickField;
 	private JTextField addressField;
 	private JTextField portField;
 	
@@ -22,14 +23,14 @@ public class GUIMain extends JFrame {
 		
 		JPanel pan = new JPanel();
 		pan.setLayout(new BoxLayout(pan ,BoxLayout.Y_AXIS));
-		
+		nickField = new JTextField(10);
 		addressField = new JTextField(10);
 		portField = new JTextField(10);
 		connectBtn = new JButton("Connect");
 		connectBtn.addActionListener(new ConnectListener());
 		
 		
-		pan.add(addressField); pan.add(portField); pan.add(connectBtn);
+		pan.add(nickField); pan.add(addressField); pan.add(portField); pan.add(connectBtn);
 		add(pan);
 		
 		addWindowListener(new CloseListener());
@@ -57,13 +58,12 @@ public class GUIMain extends JFrame {
 				System.out.println("A port number consists of a sequence of integers dumbass");
 			}
 			String serverAddress = addressField.getText();
+			String nick = nickField.getText();
 			
 			if(doing == false) {
 			
-				GUIConversation convFrame = new GUIConversation(portNr, serverAddress);
+				GUIConversation convFrame = new GUIConversation(portNr, serverAddress, nick);
 			}
-			//Conversation conv = new Conversation(portNr, serverAddress, convFrame);
-
 		}
 	}
 	

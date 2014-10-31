@@ -29,7 +29,7 @@ public class GUIConversation extends JFrame implements ActionListener {
 	private String msg;
 
 	private Conversation conv;
-	public GUIConversation(int portNr, String serverAddress) {
+	public GUIConversation(int portNr, String serverAddress, String nick) {
 		
 		this.portNr = portNr;
 		this.serverAddress = serverAddress;
@@ -41,7 +41,7 @@ public class GUIConversation extends JFrame implements ActionListener {
 		add(norPan, BorderLayout.NORTH);
 		add(southPan, BorderLayout.CENTER);
 		
-		conv = new Conversation(portNr, serverAddress, this);
+		conv = new Conversation(portNr, serverAddress, this, nick);
 		addWindowListener(new CloseListener());
 		setSize(400,400);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
