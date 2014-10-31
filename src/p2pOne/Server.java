@@ -86,53 +86,56 @@ public class Server extends Thread {
 				Socket socket = serverSocket.accept();
 
 				if(!running) break;
-
-				//Check if connecting ip already is connected
-				if(clientList.size() > 0) {
-					for(ClientThread ct: clientList) {
-						display(ct.socket.getInetAddress().getHostAddress() + " =? " + socket.getInetAddress().getHostAddress());
-						if(ct.socket.getInetAddress().equals(socket.getInetAddress())) {
-							exists = true;
+				//if(initiatingConversation == true) {
+					display("uhn");
+					//Check if connecting ip already is connected
+					if(clientList.size() > 0) {
+						for(ClientThread ct: clientList) {
+							display(ct.socket.getInetAddress().getHostAddress() + " =? " + socket.getInetAddress().getHostAddress());
+							if(ct.socket.getInetAddress().equals(socket.getInetAddress())) {
+								exists = true;
+							}
 						}
 					}
-				}
 
-				//if not connected - do this
-				if(exists == false) {
-					ClientThread client = new ClientThread(socket);
+					//if not connected - do this
+					if(exists == false) {
+						ClientThread client = new ClientThread(socket);
 
-					clientList.add(client);
+						clientList.add(client);
 
-					client.start();
-					System.out.println(socket.getInetAddress().getHostAddress() + " != " + serverSocket.getInetAddress().getHostAddress() + " == " + localServerAddress.getHostAddress());
+						client.start();
+						System.out.println(socket.getInetAddress().getHostAddress() + " != " + serverSocket.getInetAddress().getHostAddress() + " == " + localServerAddress.getHostAddress());
 
-					//check if the connected address is remote or localhost
-					for(InetAddress iAdd: inetList) {
+						//check if the connected address is remote or localhost
+						for(InetAddress iAdd: inetList) {
 
-						//if it's not from localhost - open conversation window
-						if(!socket.getInetAddress().equals(iAdd)) {
-							System.out.println("Opening window :oooo");
-							String address = socket.getInetAddress().getHostAddress();
-							System.out.println(address + " " + socket.getPort());
+							//if it's not from localhost - open conversation window
+							if(!socket.getInetAddress().equals(iAdd)) {
+								System.out.println("Opening window :oooo");
+								String address = socket.getInetAddress().getHostAddress();
+								System.out.println(address + " " + socket.getPort());
 
-							StartConversation start = new StartConversation(address, portNr, gui.getName());
-							start.start();
-							display("ujujuj");
+								StartConversation start = new StartConversation(address, portNr, gui.getName());
+								start.start();
+
+								display("ujujuj");
+								break;
+							}
 						}
+						userId++;
+
 					}
-					userId++;
 
 				}
-
-
-			} 
-			System.out.println("Closing server!");
+		//	} 
+			display("Closing server!");
 
 
 		} catch (IOException e) { display("IOException while recieving new Socket connection " + e.getMessage()); }
 
 	}
-
+	
 	/**
 	 * Broadcasts the message to the client in the clientList with matching IP
 	 * @param msg
@@ -149,7 +152,7 @@ public class Server extends Thread {
 				if(iAdd.equals(msg.getToIPAddress())) {
 
 					clientThread.sendMsg(msg);
-					display("it did broadcast?");
+					display("it did broadcast");
 				}
 			}
 		}
@@ -163,32 +166,33 @@ public class Server extends Thread {
 
 		System.out.println(text);
 	}
-	
+
 	/**
 	 * Disconnects all clients and then closes serverSocket
 	 * @throws IOException
 	 */
 	public void disconnect() throws IOException {
-		
+
 		display("Diconnecting");
 		
+		running = false;
+		
 		for(int i = 0; i < clientList.size(); i++) {
-			
+
 			clientList.get(i).disconnect();
 			display("Client " + clientList.get(i).id + " is disconnected");
 		}
-		
+
 		serverSocket.close();
 		display("ServerSocket closed");
 	}
-
+	
 	/**
 	 * Class that extends Thread and represent a new instance of a 
 	 * connection to a client
 	 * @author Frans
 	 *
 	 */
-
 	class ClientThread extends Thread {
 
 		private Socket socket;
@@ -255,7 +259,7 @@ public class Server extends Thread {
 		 * @throws IOException
 		 */
 		public void disconnect() throws IOException {
-			
+
 			if(inputStream != null) {
 				inputStream.close();
 			}
@@ -265,7 +269,7 @@ public class Server extends Thread {
 			if(socket != null) {
 				socket.close();
 			}
-			
+
 		}
 	}
 	/**
@@ -280,6 +284,7 @@ public class Server extends Thread {
 		private String address;
 		private int port;
 		private String nickName;
+		
 		public StartConversation(String address, int port, String nickName) {
 			this.address = address;
 			this.port = port;
