@@ -108,7 +108,7 @@ public class Server extends Thread {
 
 					//check if the connected address is remote or localhost
 					for(InetAddress iAdd: inetList) {
-						
+
 						//if it's not from localhost - open conversation window
 						if(!socket.getInetAddress().equals(iAdd)) {
 							System.out.println("Opening window :oooo");
@@ -208,17 +208,17 @@ public class Server extends Thread {
 			display("ClientThread" + id + " running");
 
 			while(true) {
-
 				try {
 					display("ClientThread" + id + " get msg");
 					msg = (Message) inputStream.readObject();
 					//display(msg.toString());
 				}
-				catch(IOException e) { display("IOException while reading msg for ClientThread" + e.getMessage()); }
+				catch(IOException e) { display("IOException while reading msg for ClientThread" + e.getMessage()); break; }
 				catch(ClassNotFoundException e) { display("ClassNotFoundException while reading msg for ClientThread" + e.getMessage()); }
 
 				display("Time to broadcast for clientThread" +id);
 				broadcast(msg);
+
 			}
 		}
 
