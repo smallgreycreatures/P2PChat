@@ -76,11 +76,13 @@ public class Server extends Thread {
 
 			running = true;
 			boolean exists;
-
+			boolean isLocalAddress;
+			
 			while(running) {
 
 				exists = false;
-
+				isLocalAddress = false;
+				
 				System.out.println("Server up! waiting for incoming connections");
 
 				Socket socket = serverSocket.accept();
@@ -92,14 +94,24 @@ public class Server extends Thread {
 				if(clientList.size() > 0) {
 					for(ClientThread ct: clientList) {
 						display(ct.socket.getInetAddress().getHostAddress() + " =? " + socket.getInetAddress().getHostAddress());
+						
 						if(ct.socket.getInetAddress().equals(socket.getInetAddress())) {
 							exists = true;
 						}
 					}
+					
+					for(InetAddress iAdd: inetList) {
+						
+						if(iAdd.equals(socket.getInetAddress())) {
+							
+							isLocalAddress = true;
+						}
+						
+					}
 				}
 
 				//if not connected - do this
-				if(exists == false) {
+				if(exists == false || isLocalAddress == true) {
 					ClientThread client = new ClientThread(socket);
 
 					clientList.add(client);
