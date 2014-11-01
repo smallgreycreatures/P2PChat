@@ -98,20 +98,11 @@ public class Server extends Thread {
 						if(ct.socket.getInetAddress().equals(socket.getInetAddress())) {
 							exists = true;
 						}
-					}
-					
-					for(InetAddress iAdd: inetList) {
-						
-						if(iAdd.equals(socket.getInetAddress())) {
-							
-							isLocalAddress = true;
-						}
-						
-					}
+					}	
 				}
-
+				
 				//if not connected - do this
-				if(exists == false || isLocalAddress == true) {
+				if(exists == false) {
 					ClientThread client = new ClientThread(socket);
 
 					clientList.add(client);
@@ -277,7 +268,8 @@ public class Server extends Thread {
 		 * @throws IOException
 		 */
 		public void disconnectClient() throws IOException {
-
+			System.out.println("ID removed" + clientList.remove(id).id + "ID of this " + id);
+			
 			if(inputStream != null) {
 				inputStream.close();
 			}
